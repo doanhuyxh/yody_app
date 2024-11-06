@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Text,
   View,
@@ -9,16 +9,14 @@ import {
   RefreshControl,
 } from 'react-native';
 
-import {useNavigation} from '@react-navigation/native';
 import Header from '../components/Header';
 import axiosInstance from '../configs/axios';
-import {ProductByCategory} from '../components/Product';
-import BannerSlider, {} from '../components/ScrollFlashList/BannerSlider.tsx'
+import { ProductByCategory } from '../components/Product';
+import BannerSlider, { } from '../components/ScrollFlashList/BannerSlider.tsx'
 
 function HomeScreen() {
   const [refreshing, setRefreshing] = useState<boolean>(false);
-  const width = Dimensions.get('window').width;
-  const height = Dimensions.get('window').height;
+  
   const banner = [
     require('../assets/hero_img1.png'),
     require('../assets/hero_img2.png'),
@@ -26,7 +24,6 @@ function HomeScreen() {
     require('../assets/hero_img4.png'),
   ];
 
-  let navigation = useNavigation();
   const [category, setCategory] = useState<any>([]);
 
   const CallData = () => {
@@ -39,10 +36,10 @@ function HomeScreen() {
   useEffect(() => {
     setRefreshing(true);
     CallData();
-  }, [refreshing]);
+  }, []);
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={style.container}>
       <ScrollView
         style={style.container}
         refreshControl={
@@ -50,15 +47,15 @@ function HomeScreen() {
         }>
         <Header />
         <View style={style.bannerContainer}>
-         <BannerSlider banner={banner}/>
+          <BannerSlider banner={banner} />
         </View>
         <View style={style.categoryContainer}>
           {category &&
             category.map((item: any) => (
               <View key={item.Id} style={style.categoryItemsContainer}>
                 <View style={style.categoryItems}>
-                  <View style={style.line}></View>
-                  <View style={{flex: 1, justifyContent: 'center'}}>
+                  <View style={style.line}><Text>{}</Text></View>
+                  <View style={style.wff}>
                     <Text style={style.text}>{item.Name}</Text>
                   </View>
                 </View>
@@ -86,12 +83,25 @@ const style = StyleSheet.create({
   categoryContainer: {
     flex: 1,
     justifyContent: 'center',
-    gap: 20,
     marginTop: 10,
+    borderRadius: 10,
+    overflow: 'hidden',
   },
   categoryItemsContainer: {
     flex: 1,
-    marginTop: 10,
+    marginTop: 20,
+    paddingVertical:30,
+    paddingHorizontal: 10,
+    shadowColor: 'gray',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.9,
+    shadowRadius: 4,
+    elevation: 10,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#f8f8f8',
+    borderRadius: 10,
+    backgroundColor: '#f5ebe9',
   },
   categoryItems: {
     flex: 1,
@@ -109,6 +119,10 @@ const style = StyleSheet.create({
     color: 'black',
     fontSize: 20,
     lineHeight: 24,
+  },
+  wff:{
+    flex: 1,
+    justifyContent: 'center',
   },
 });
 

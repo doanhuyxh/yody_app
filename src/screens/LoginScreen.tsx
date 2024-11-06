@@ -1,16 +1,15 @@
 import {useNavigation} from '@react-navigation/native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Text,
   View,
   TextInput,
-  Button,
   StyleSheet,
   Alert,
   Image,
   TouchableOpacity,
 } from 'react-native';
-import {storeData} from '../configs/asyncStrong';
+import {clearData, storeData} from '../configs/asyncStrong';
 import axiosInstance from '../configs/axios';
 
 function LoginScreen() {
@@ -31,7 +30,7 @@ function LoginScreen() {
     };
 
     const res: any = await axiosInstance.post('/auth/login', data);
-    
+
     if (res.code == 20001) {
       await storeData('customer', res.data.customer);
       await storeData(
@@ -49,6 +48,10 @@ function LoginScreen() {
   const handleRegister = () => {
     navigation.navigate('Register' as never);
   };
+
+  useEffect(() => {
+    clearData();
+  }, []);
 
   return (
     <View style={styles.container}>

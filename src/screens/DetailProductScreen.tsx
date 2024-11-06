@@ -1,5 +1,6 @@
-import {useNavigation, useRoute} from '@react-navigation/native';
-import {useEffect, useState} from 'react';
+import React from 'react';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useEffect, useState } from 'react';
 import {
   Alert,
   SafeAreaView,
@@ -11,16 +12,19 @@ import {
   ScrollView,
   Dimensions,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 import RenderHTML from 'react-native-render-html';
-import {useSelector} from 'react-redux';
+import { useSelector } from 'react-redux';
 import axiosInstance from '../configs/axios';
 
+import { formatCurrency } from '../utils/format';
+
 function DetailProductScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const router = useRoute<any>();
 
-  const {width, height} = Dimensions.get('window');
-  const {productId} = router.params;
+  const { width, height } = Dimensions.get('window');
+  const { productId } = router.params;
 
   const color = useSelector((state: any) => state.color.Colors);
   const size = useSelector((state: any) => state.size.sizes);
@@ -36,6 +40,42 @@ function DetailProductScreen() {
   const [indexSelectImage, setIndexSelectImage] = useState<number>(0);
   const [colorSelected, setColorSelected] = useState<number>(0);
   const [sizeSelected, setSizeSelected] = useState<number>(0);
+
+  const HandleAddToCard = () => {
+    if (colorSelected == 0 || sizeSelected == 0) {
+      Toast.show({
+        type: 'error',
+        text2: 'Vui lòng chọn màu và kích thước',
+      } as any);
+      return;
+    }
+    let variant = variants.find(
+      i => i.color_id == colorSelected && i.size_id == sizeSelected,
+    );
+
+    if (!variant) {
+      Toast.show({
+        type: 'error',
+        text1: 'Sản phẩm hết hàng vui lòng chọn sản phẩm khác',
+      } as any);
+      return;
+    }
+
+    Toast.show({
+      type: 'success',
+      text1: 'Đã thêm vào giỏ hàng',
+      text2: 'Vui lòng kiểm tra giỏ hàng của bạn',
+    } as any);
+
+    axiosInstance.post('/shopping_card/add_to_card', {product_variant_id: variant.id})
+    .then(res => {
+      console.log(res);
+    })
+    .catch(err => {
+      console.log(err);
+    });
+
+  }
 
   useEffect(() => {
     const fetchProductData = async () => {
@@ -57,12 +97,13 @@ function DetailProductScreen() {
   }, [productId]);
 
   useEffect(() => {
+    setIndexSelectImage(0);
     if (colorSelected == 0) {
       setImageFilter(images);
     } else {
       setImageFilter(images.filter(i => i.color_id == colorSelected));
     }
-    setIndexSelectImage(0);
+    console.log(colorSelected);
   }, [colorSelected]);
 
   if (loading) {
@@ -102,7 +143,7 @@ function DetailProductScreen() {
                     width={60}
                     height={70}
                     style={{}}
-                    source={{uri: `https://api.yody.lokid.xyz` + item.link}}
+                    source={{ uri: `https://api.yody.lokid.xyz` + item.link }}
                   />
                 </TouchableOpacity>
               ))}
@@ -112,14 +153,12 @@ function DetailProductScreen() {
           <View style={styles.productNameWrapper}>
             <Text style={styles.productName}>{product.name}</Text>
           </View>
-          <View style={styles.categoryWrapper}>
-            {categoryProduct &&
-              categoryProduct.map((item: any, index: number) => (
-                <Text key={index} style={styles.categoryText}>
-                  {category.find((i: any) => i.Id == item.category_id)?.Name ||
-                    'Không có danh mục'}
-                </Text>
-              ))}
+          <View style={{
+            flex: 1,
+            width: "100%",
+            justifyContent: "flex-end"
+          }}>
+            <Text style={{ fontSize: 20, color: '#10b9b0', fontWeight: '700', textAlign: 'right' }}>{formatCurrency(product.price)} VNĐ</Text>
           </View>
           <View style={styles.sizeSelectionWrapper}>
             <Text style={styles.sizeSelectionText}>
@@ -175,22 +214,31 @@ function DetailProductScreen() {
                     <View
                       style={[
                         styles.colorIndicator,
-                        {backgroundColor: item.hex_code},
-                      ]}></View>
+                        { backgroundColor: item.hex_code },
+                      ]} />
                   </TouchableOpacity>
                 );
               })}
             </View>
           </View>
+          <View style={styles.categoryWrapper}>
+            {categoryProduct &&
+              categoryProduct.map((item: any, index: number) => (
+                <Text key={index} style={styles.categoryText}>
+                  {category.find((i: any) => i.Id == item.category_id)?.Name ||
+                    'Không có danh mục'}
+                </Text>
+              ))}
+          </View>
           <View style={styles.productInfoWrapper}>
             <View style={styles.infoHeader}>
-              <View style={styles.infoIndicator}></View>
+              <View style={styles.infoIndicator} />
               <Text style={styles.infoTitle}>Thông tin sản phẩm</Text>
             </View>
             <View style={styles.infoContent}>
               <RenderHTML
                 contentWidth={width}
-                source={{html: product.description || '<p>Không có mô tả</p>'}}
+                source={{ html: `${product.description}` }}
               />
             </View>
           </View>
@@ -200,7 +248,8 @@ function DetailProductScreen() {
         <TouchableOpacity style={styles.buyButton}>
           <Text style={styles.buyButtonText}>Mua ngay</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.cartButton}>
+        <TouchableOpacity style={styles.cartButton}
+          onPress={HandleAddToCard}>
           <Text style={styles.cartButtonText}>🛒</Text>
         </TouchableOpacity>
       </View>
@@ -219,11 +268,11 @@ const styles = StyleSheet.create({
   },
   containerImagePreview: {
     flex: 1,
-    marginBottom: 30,
+    marginBottom: 10,
   },
   imagePreviewWrapper: {
     flex: 1,
-    marginBottom: 30,
+    marginBottom: 10,
     justifyContent: 'center',
     alignContent: 'center',
     alignItems: 'center',
@@ -234,10 +283,10 @@ const styles = StyleSheet.create({
     resizeMode: 'stretch',
   },
   imageThumbnailWrapper: {
-    borderRadius: 80,
+    borderRadius: 90,
     overflow: 'hidden',
     marginRight: 20,
-    padding: 5,
+    padding: 8,
   },
   containerDetail: {
     flex: 1,
@@ -249,6 +298,7 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 30,
     fontWeight: '700',
+    textAlign: 'left',
   },
   categoryWrapper: {
     flexDirection: 'row',
@@ -262,14 +312,14 @@ const styles = StyleSheet.create({
     color: 'white',
     opacity: 0.6,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.5,
     shadowRadius: 2,
     elevation: 5,
   },
   sizeSelectionWrapper: {
     margin: 10,
-    marginBottom: 20,
+    marginBottom: 10,
     flexDirection: 'column',
     gap: 10,
   },
@@ -291,7 +341,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     elevation: 2,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
   },
@@ -301,7 +351,7 @@ const styles = StyleSheet.create({
   sizeButtonText: {
     color: 'black',
     padding: 0,
-    width:"auto"
+    width: "auto"
   },
   sizeTextDisabled: {
     textDecorationLine: 'line-through',
@@ -329,7 +379,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     elevation: 2,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
     padding: 5,
@@ -367,16 +417,17 @@ const styles = StyleSheet.create({
   },
   containerBtn: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     padding: 10,
     borderTopWidth: 1,
     borderTopColor: '#ddd',
+    height: 78,
   },
   buyButton: {
     backgroundColor: '#10b9b0',
     borderRadius: 10,
     padding: 15,
-    width: '48%',
+    width: '65%',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -390,7 +441,7 @@ const styles = StyleSheet.create({
     borderColor: '#10b9b0',
     borderRadius: 10,
     padding: 15,
-    width: '48%',
+    width: '25%',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -404,7 +455,7 @@ const styles = StyleSheet.create({
   },
   active: {
     borderColor: 'red',
-    borderWidth:3
+    borderWidth: 3
   },
 });
 

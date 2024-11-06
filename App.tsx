@@ -1,11 +1,12 @@
 import 'react-native-gesture-handler';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {Provider} from 'react-redux';
 import store from './src/configs/store.ts';
 import './src/configs/logger.ts';
+import Toast from 'react-native-toast-message';
 
 import HomeScreen from './src/screens/HomeScreen.tsx';
 import LoginScreen from './src/screens/LoginScreen.tsx';
@@ -18,15 +19,24 @@ import { fetchSizes } from './src/slices/sizeSlice.ts';
 import { fetchColors } from './src/slices/colorSlice.ts';
 import { fetchCategory } from './src/slices/categorySlice.ts';
 
+declare global {
+  var toastRef: any;
+}
+
 const Stack = createNativeStackNavigator();
 
 function App() {
+  const toastRef = useRef<any>(null);
 
   useEffect(()=>{
 
     store.dispatch(fetchSizes())
     store.dispatch(fetchColors())
     store.dispatch(fetchCategory())
+
+    if (toastRef.current) {
+      global.toastRef = toastRef.current;
+    }
 
   },[])
 
@@ -65,6 +75,7 @@ function App() {
             />
             <Stack.Screen name="ShoppingCard" component={ShoppingCardScreen} />
           </Stack.Navigator>
+          <Toast ref={toastRef}/>
         </NavigationContainer>
       </Provider>
     </GestureHandlerRootView>

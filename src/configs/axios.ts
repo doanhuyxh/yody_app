@@ -4,6 +4,9 @@ import { getData } from './asyncStrong';
 
 const getToken = async () => {
     let token = await getData("access_token")
+    if (token) {
+        token = JSON.parse(token)
+    }
     return token
 }
 
@@ -18,8 +21,9 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   async (config) => {
-    const token = await getToken();
+    let token = await getToken();
     if (token) {
+      token = token.replace(/['"]+/g, '');
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;

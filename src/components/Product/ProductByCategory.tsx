@@ -1,23 +1,21 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   Image,
   TouchableOpacity,
 } from 'react-native';
 import axiosInstance from '../../configs/axios';
-import {ScrollView} from 'react-native-gesture-handler';
+import { ScrollView } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 
 type ProductByCategoryProps = {
   cateId: number;
 };
 
-const ProductByCategory: React.FC<ProductByCategoryProps> = ({cateId}) => {
-  const navigation= useNavigation<any>
-  ()
+const ProductByCategory: React.FC<ProductByCategoryProps> = ({ cateId }) => {
+  const navigation = useNavigation<any>();
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -29,15 +27,16 @@ const ProductByCategory: React.FC<ProductByCategoryProps> = ({cateId}) => {
       axiosInstance
         .get(`/category/product/${cateId}?page=1&pageSize=10`)
         .then(res => {
-          let products = res.data;
-          let fetchImagePromises = products.map(async (product: any) => {
+          let productData = res.data;
+          let fetchImagePromises = productData.map(async (product: any) => {
             try {
               const imageResponse = await axiosInstance.get(
                 `/product/image/${product.id}`,
               );
-              return {...product, imageUrl: imageResponse.data};
-            } catch (error) {
-              return {...product, imageUrl: null};
+              return { ...product, imageUrl: imageResponse.data };
+            }
+            catch {
+              return { ...product, imageUrl: null };
             }
           });
 
@@ -46,7 +45,7 @@ const ProductByCategory: React.FC<ProductByCategoryProps> = ({cateId}) => {
             setLoading(false);
           });
         })
-        .catch(err => {
+        .catch(() => {
           setError('Failed to load products');
           setLoading(false);
         });
@@ -67,11 +66,11 @@ const ProductByCategory: React.FC<ProductByCategoryProps> = ({cateId}) => {
       style={style.container}
       showsHorizontalScrollIndicator={false}>
       {products.map(item => (
-        <TouchableOpacity key={item.id} style={style.productItem} 
-        onPress={()=>{
-          navigation.navigate('DetailProduct' as never, { productId: item.id });
-        }}>
-          <View style={{flex: 1}}>
+        <TouchableOpacity key={item.id} style={style.productItem}
+          onPress={() => {
+            navigation.navigate('DetailProduct' as never, { productId: item.id });
+          }}>
+          <View style={style.imageContainer}>
             {item.imageUrl && item.imageUrl[0]?.image_link ? (
               <Image
                 source={{
@@ -89,23 +88,11 @@ const ProductByCategory: React.FC<ProductByCategoryProps> = ({cateId}) => {
               <Text style={style.productPrice}>Giá: {item.price} VNĐ</Text>
             </View>
             <View style={style.btnContainer}>
-              <TouchableOpacity
-                style={[
-                  style.btn,
-                  {
-                    backgroundColor: 'red',
-                  },
-                ]}>
-                <Text style={{color: 'white'}}>Mua ngay</Text>
+              <TouchableOpacity style={style.buyNowBtn}>
+                <Text style={style.btnText}>Mua ngay</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  style.btn,
-                  {
-                    backgroundColor: '#10b9b0',
-                  },
-                ]}>
-                <Text style={{color:"white"}}>🛒</Text>
+              <TouchableOpacity style={style.cartBtn}>
+                <Text style={style.btnText}>🛒</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -119,7 +106,7 @@ const style = StyleSheet.create({
   container: {
     padding: 10,
     margin: 'auto',
-    width: '90%',
+    width: '100%',
     height: 'auto',
   },
   productItem: {
@@ -137,6 +124,9 @@ const style = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 4,
     elevation: 5,
+  },
+  imageContainer: {
+    flex: 1,
   },
   productImage: {
     width: 200,
@@ -169,15 +159,27 @@ const style = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginTop: 10,
-    gap:10,
-    height:40
+    gap: 10,
+    height: 40,
   },
-  btn: {
+  buyNowBtn: {
     flex: 1,
     justifyContent: 'center',
-    alignContent: 'center',
     alignItems: 'center',
     borderRadius: 40,
+    backgroundColor: 'red',
+  },
+  cartBtn: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 40,
+    backgroundColor: '#10b9b0',
+  },
+  btnText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
 
