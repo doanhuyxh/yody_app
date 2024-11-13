@@ -1,10 +1,10 @@
-import { Text, View } from "react-native";
+import { SafeAreaView, Text, View } from "react-native";
 
 function ShoppingCardScreen (){
     return (
-        <View>
+        <SafeAreaView>
             <Text>ShoppingCardScreen</Text>
-        </View>
+        </SafeAreaView>
     )
 }
 

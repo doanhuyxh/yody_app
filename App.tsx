@@ -19,9 +19,7 @@ import { fetchSizes } from './src/slices/sizeSlice.ts';
 import { fetchColors } from './src/slices/colorSlice.ts';
 import { fetchCategory } from './src/slices/categorySlice.ts';
 
-declare global {
-  var toastRef: any;
-}
+
 
 const Stack = createNativeStackNavigator();
 
@@ -33,10 +31,6 @@ function App() {
     store.dispatch(fetchSizes())
     store.dispatch(fetchColors())
     store.dispatch(fetchCategory())
-
-    if (toastRef.current) {
-      global.toastRef = toastRef.current;
-    }
 
   },[])
 
@@ -75,7 +69,7 @@ function App() {
             />
             <Stack.Screen name="ShoppingCard" component={ShoppingCardScreen} />
           </Stack.Navigator>
-          <Toast ref={toastRef}/>
+          <Toast />
         </NavigationContainer>
       </Provider>
     </GestureHandlerRootView>
