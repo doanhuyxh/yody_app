@@ -1,20 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import axiosInstance from '../../configs/axios';
-import { ScrollView } from 'react-native-gesture-handler';
-import { useNavigation } from '@react-navigation/native';
+import {ScrollView} from 'react-native-gesture-handler';
+import {useNavigation} from '@react-navigation/native';
 
 type ProductByCategoryProps = {
   cateId: number;
 };
 
-const ProductByCategory: React.FC<ProductByCategoryProps> = ({ cateId }) => {
+const ProductByCategory: React.FC<ProductByCategoryProps> = ({cateId}) => {
   const navigation = useNavigation<any>();
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -33,10 +27,9 @@ const ProductByCategory: React.FC<ProductByCategoryProps> = ({ cateId }) => {
               const imageResponse = await axiosInstance.get(
                 `/product/image/${product.id}`,
               );
-              return { ...product, imageUrl: imageResponse.data };
-            }
-            catch {
-              return { ...product, imageUrl: null };
+              return {...product, imageUrl: imageResponse.data};
+            } catch {
+              return {...product, imageUrl: null};
             }
           });
 
@@ -66,9 +59,11 @@ const ProductByCategory: React.FC<ProductByCategoryProps> = ({ cateId }) => {
       style={style.container}
       showsHorizontalScrollIndicator={false}>
       {products.map(item => (
-        <TouchableOpacity key={item.id} style={style.productItem}
+        <TouchableOpacity
+          key={item.id}
+          style={style.productItem}
           onPress={() => {
-            navigation.navigate('DetailProduct' as never, { productId: item.id });
+            navigation.navigate('DetailProduct' as never, {productId: item.id});
           }}>
           <View style={style.imageContainer}>
             {item.imageUrl && item.imageUrl[0]?.image_link ? (
@@ -88,10 +83,22 @@ const ProductByCategory: React.FC<ProductByCategoryProps> = ({ cateId }) => {
               <Text style={style.productPrice}>Giá: {item.price} VNĐ</Text>
             </View>
             <View style={style.btnContainer}>
-              <TouchableOpacity style={style.buyNowBtn}>
+              <TouchableOpacity
+                style={style.buyNowBtn}
+                onPress={() => {
+                  navigation.navigate('DetailProduct' as never, {
+                    productId: item.id,
+                  });
+                }}>
                 <Text style={style.btnText}>Mua ngay</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={style.cartBtn}>
+              <TouchableOpacity
+                style={style.cartBtn}
+                onPress={() => {
+                  navigation.navigate('DetailProduct' as never, {
+                    productId: item.id,
+                  });
+                }}>
                 <Text style={style.btnText}>🛒</Text>
               </TouchableOpacity>
             </View>

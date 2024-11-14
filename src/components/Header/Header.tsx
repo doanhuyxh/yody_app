@@ -1,8 +1,8 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { useEffect, useState, useCallback } from 'react';
-import { useDispatch } from 'react-redux';
-import { getData } from '../../configs/asyncStrong';
+import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import {useEffect, useState, useCallback} from 'react';
+import {useDispatch} from 'react-redux';
+import {getData} from '../../configs/asyncStrong';
 import axiosInstance from '../../configs/axios';
 
 function Header() {
@@ -14,27 +14,26 @@ function Header() {
   const GetUser = useCallback(async () => {
     let userJson = await getData('customer');
     if (!userJson) {
-      setUser(null); // Đảm bảo rằng user được đặt là null nếu không tìm thấy
+      setUser(null);
       return;
     }
-    
-    let userData = JSON.parse(userJson);
-    setUser(userData); // Cập nhật thông tin user
 
-    // Gọi API để lấy số lượng thẻ trong giỏ hàng
+    let userData = JSON.parse(userJson);
+    setUser(userData);
+
     try {
       const res = await axiosInstance.get('/shopping_card');
-      //setNumberCard(res.data.cardCount); // Cập nhật số lượng thẻ
+      setNumberCard(res.data.length);
     } catch (error) {
       console.error('Error fetching shopping card:', error);
-      setNumberCard(0); // Đặt lại số lượng thẻ nếu có lỗi
+      setNumberCard(0);
     }
   }, []);
 
   useFocusEffect(
     useCallback(() => {
-      GetUser(); // Gọi GetUser mỗi khi màn hình được focus
-    }, [GetUser])
+      GetUser();
+    }, [GetUser]),
   );
 
   return (
@@ -49,7 +48,7 @@ function Header() {
               navigation.navigate('Profile' as never);
             }}>
             <Image
-              style={{ width: 35, height: 35, padding: 4, borderRadius: 10 }}
+              style={{width: 35, height: 35, padding: 4, borderRadius: 10}}
               source={require('../../assets/user.png')}
             />
           </TouchableOpacity>
@@ -84,7 +83,7 @@ function Header() {
                 borderRadius: 10,
               }}>
               <Image
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                style={{width: '100%', height: '100%', objectFit: 'cover'}}
                 source={require('../../assets/cart.png')}
               />
             </View>

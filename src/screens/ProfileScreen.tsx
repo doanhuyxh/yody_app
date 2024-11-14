@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { clearData, getData } from '../configs/asyncStrong';
+import {useNavigation} from '@react-navigation/native';
+import {clearData, getData} from '../configs/asyncStrong';
 
 function ProfileScreen() {
   const navigation = useNavigation();
@@ -20,7 +20,7 @@ function ProfileScreen() {
   });
 
   const GetUser = async () => {
-    const userJson = await getData("customer");
+    const userJson = await getData('customer');
     const userData = JSON.parse(userJson || '{}');
     setUser({
       fullName: userData.full_name || '',
@@ -32,7 +32,7 @@ function ProfileScreen() {
 
   const Logout = async () => {
     await clearData();
-    navigation.navigate("Home" as never);
+    navigation.navigate('Home' as never);
   };
 
   useEffect(() => {
@@ -40,29 +40,70 @@ function ProfileScreen() {
   }, []);
 
   const handleChange = (field: keyof typeof user, value: string) => {
-    setUser({ ...user, [field]: value });
+    setUser({...user, [field]: value});
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      <View
+        style={[
+          styles.form,
+          {
+            flexDirection: 'row',
+            alignContent:'center',
+            justifyContent:'center',
+            gap: 30,
+            padding:20,
+            marginBottom:10
+          },
+        ]}>
+        <Text style={styles.btn}>Chờ xác nhận</Text>
+        <Text style={styles.btn}>Đang giao hàng</Text>
+        <Text style={styles.btn}>Hoàn thành</Text>
+      </View>
+
       <View style={styles.form}>
         {Object.entries(user).map(([key, value]) => (
           <View key={key} style={styles.inputContainer}>
-            <Text>{key === 'fullName' ? 'Họ và tên' : key === 'phoneNumber' ? 'Số điện thoại' : key === 'email' ? 'Email' : 'Địa chỉ'}</Text>
+            <Text>
+              {key === 'fullName'
+                ? 'Họ và tên'
+                : key === 'phoneNumber'
+                ? 'Số điện thoại'
+                : key === 'email'
+                ? 'Email'
+                : 'Địa chỉ'}
+            </Text>
             <TextInput
               style={styles.input}
               value={value}
-              onChangeText={(text) => handleChange(key as keyof typeof user, text)}
-              placeholder={`Nhập ${key === 'fullName' ? 'họ và tên' : key === 'phoneNumber' ? 'số điện thoại' : key === 'email' ? 'email' : 'địa chỉ'}`}
-              keyboardType={key === 'phoneNumber' ? 'phone-pad' : key === 'email' ? 'email-address' : 'default'}
+              onChangeText={text =>
+                handleChange(key as keyof typeof user, text)
+              }
+              placeholder={`Nhập ${
+                key === 'fullName'
+                  ? 'họ và tên'
+                  : key === 'phoneNumber'
+                  ? 'số điện thoại'
+                  : key === 'email'
+                  ? 'email'
+                  : 'địa chỉ'
+              }`}
+              keyboardType={
+                key === 'phoneNumber'
+                  ? 'phone-pad'
+                  : key === 'email'
+                  ? 'email-address'
+                  : 'default'
+              }
             />
           </View>
         ))}
-        <View style={{ paddingBottom: 50 }}>
+        <View style={{paddingBottom: 50}}>
           <TouchableOpacity
             onPress={Logout}
-            style={{ backgroundColor: '#10b9b0', padding: 20, borderRadius: 20 }}>
-            <Text style={{ color: '#fff', textAlign: 'center' }}>Đăng xuất</Text>
+            style={{backgroundColor: '#10b9b0', padding: 20, borderRadius: 20}}>
+            <Text style={{color: '#fff', textAlign: 'center'}}>Đăng xuất</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -106,6 +147,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginTop: 5,
   },
+  btn:{
+    fontSize:18
+  }
 });
 
 export default ProfileScreen;

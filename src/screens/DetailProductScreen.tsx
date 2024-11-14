@@ -238,7 +238,7 @@ function DetailProductScreen() {
             <View style={styles.infoContent}>
               <RenderHTML
                 contentWidth={width}
-                source={{ html: `${product.description}` }}
+                source={{ html: `${product.description}` || 'Không có mô tả sản phẩm' }}
               />
             </View>
           </View>

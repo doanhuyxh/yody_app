@@ -67,7 +67,12 @@ function App() {
                 headerBackTitleVisible: false,
               }}
             />
-            <Stack.Screen name="ShoppingCard" component={ShoppingCardScreen} />
+            <Stack.Screen name="ShoppingCard" component={ShoppingCardScreen}
+            options={{
+              headerShown: true,
+              title: 'Giỏ hàng',
+              headerBackTitleVisible: false,
+            }} />
           </Stack.Navigator>
           <Toast />
         </NavigationContainer>
