@@ -1,14 +1,24 @@
 import axios from 'axios';
-import { getData } from './asyncStrong';
-
+import { getData, storeData } from './asyncStrong';
 
 const getToken = async () => {
-    let token = await getData("access_token")
+  let token = await getData("access_token");
+  if (token) {
+    token = JSON.parse(token);
+  }
+  return token;
+};
+
+const getRefreshToken = async () => {
+  let token = await getData("refresh_token");
+  if (token) {
+    token = JSON.parse(token);
     if (token) {
-        token = JSON.parse(token)
+      token = token.replace(/['"]+/g, '');
     }
-    return token
-}
+  }
+  return token;
+};
 
 const axiosInstance = axios.create({
   baseURL: 'https://api.yody.lokid.xyz/api',
@@ -24,6 +34,7 @@ axiosInstance.interceptors.request.use(
     let token = await getToken();
     if (token) {
       token = token.replace(/['"]+/g, '');
+      console.log(`Bearer ${token}`);
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -37,8 +48,39 @@ axiosInstance.interceptors.response.use(
   (response) => {
     return response.data;
   },
-  (error) => {
+  async (error) => {
     if (error.response) {
+      const originalRequest = error.config;
+      
+      if (error.response.data.code === 20005 && !originalRequest._retry) {
+        originalRequest._retry = true; 
+
+        const refreshToken = await getRefreshToken();
+        if (refreshToken) {
+          try {
+            const response = await axios.post(
+              'https://api.yody.lokid.xyz/api/auth/refresh',
+              {},
+              {
+                headers: {
+                  Authorization: `Bearer ${refreshToken}`,
+                },
+              }
+            );
+
+            const newAccessToken = response.data?.access_token;
+            if (newAccessToken) {
+              await storeData("access_token", JSON.stringify(newAccessToken));
+              originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+              return axiosInstance(originalRequest);
+            }
+          } catch (refreshError) {
+            console.error('Refresh token failed:', refreshError);
+            return Promise.reject(refreshError);
+          }
+        }
+      }
+
       console.error('Error response:', error.response);
     } else if (error.request) {
       console.error('Error request:', error.request);

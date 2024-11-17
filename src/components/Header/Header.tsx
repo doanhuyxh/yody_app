@@ -23,7 +23,7 @@ function Header() {
 
     try {
       const res = await axiosInstance.get('/shopping_card');
-      setNumberCard(res.data.length);
+      setNumberCard(res.data?.length || 0);
     } catch (error) {
       console.error('Error fetching shopping card:', error);
       setNumberCard(0);

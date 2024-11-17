@@ -8,7 +8,10 @@ import {
   View,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faWallet, faStrikethrough, faTruckFast, faStar } from '@fortawesome/free-solid-svg-icons';
 import {clearData, getData} from '../configs/asyncStrong';
+import axiosInstance from '../configs/axios';
 
 function ProfileScreen() {
   const navigation = useNavigation();
@@ -19,21 +22,55 @@ function ProfileScreen() {
     address: '',
   });
 
+  const [order_number, setOrder_number] = useState<any>({});
+
   const GetUser = async () => {
     const userJson = await getData('customer');
     const userData = JSON.parse(userJson || '{}');
+
     setUser({
       fullName: userData.full_name || '',
       phoneNumber: userData.phone_number || '',
       email: userData.email || '',
       address: userData.address || '',
     });
+
+    if (userData != null && userData != '') {
+      let pending_order = axiosInstance.get(
+        '/order/order_count_by_status?status=pending',
+      );
+      let shipping_order = axiosInstance.get(
+        '/order/order_count_by_status?status=shipping',
+      );
+      let success_order = axiosInstance.get(
+        '/order/order_count_by_status?status=success',
+      );
+      let cancel_order = axiosInstance.get(
+        '/order/order_count_by_status?status=cancel',
+      );
+
+      const [pendingResponse, shippingResponse, successResponse] =
+        await Promise.all([pending_order, shipping_order, success_order]);
+      const pendingCount = pendingResponse.data || 0;
+      const shippingCount = shippingResponse.data || 0;
+      const successCount = successResponse.data || 0;
+      setOrder_number({
+        pending: pendingCount,
+        shipping: shippingCount,
+        success: successCount,
+      });
+    }
   };
 
   const Logout = async () => {
     await clearData();
     navigation.navigate('Home' as never);
   };
+
+  const HandleChangeScreenHistory = (status: string, navigation: any) => {
+    navigation.navigate('OrderHistory', { status });
+  };
+  
 
   useEffect(() => {
     GetUser();
@@ -45,21 +82,46 @@ function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+    
       <View
         style={[
           styles.form,
           {
             flexDirection: 'row',
-            alignContent:'center',
-            justifyContent:'center',
-            gap: 30,
-            padding:20,
-            marginBottom:10
+            alignItems: 'center',
+            justifyContent: 'space-around',
+            gap: 5,
+            paddingVertical: 5,
+            marginBottom: 20,
           },
         ]}>
-        <Text style={styles.btn}>Chờ xác nhận</Text>
-        <Text style={styles.btn}>Đang giao hàng</Text>
-        <Text style={styles.btn}>Hoàn thành</Text>
+        <TouchableOpacity
+          style={[styles.orderButton]}
+          onPress={() => HandleChangeScreenHistory('pending', navigation)}>
+            <FontAwesomeIcon icon={faWallet} color='#FFC107' style={styles.icon} size={30}/>
+          <Text style={styles.orderCount}>{order_number.pending}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.orderButton}
+          onPress={() => HandleChangeScreenHistory('shipping', navigation)}>
+         <FontAwesomeIcon icon={faTruckFast} color='#17A2B8' style={styles.icon} size={30}/>
+          <Text style={styles.orderCount}>{order_number.shipping}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.orderButton}
+          onPress={() => HandleChangeScreenHistory('cancel', navigation)}>
+          <FontAwesomeIcon icon={faStrikethrough} color='#DC3545' style={styles.icon} size={30}/>
+          <Text style={styles.orderCount}>{order_number.shipping}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.orderButton}
+          onPress={() => HandleChangeScreenHistory('success', navigation)}>
+          <FontAwesomeIcon icon={faStar} color='#28A745' style={styles.icon} size={30}/>
+          <Text style={styles.orderCount}>{order_number.success}</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.form}>
@@ -121,7 +183,7 @@ const styles = StyleSheet.create({
   },
   form: {
     width: '100%',
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     backgroundColor: '#fff',
     borderRadius: 10,
     shadowColor: '#000',
@@ -147,9 +209,37 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginTop: 5,
   },
-  btn:{
-    fontSize:18
-  }
+  btn: {
+    fontSize: 18,
+  },
+  orderButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 4,
+    borderRadius: 20,
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+    width: 60,
+    position: 'relative',
+  },
+  btnText: {
+    color: '#fff',
+    fontSize: 10,
+    textAlign: 'center',
+    paddingTop: 2,
+    paddingBottom: 2,
+  },
+  orderCount: {
+    color: 'red',
+    fontSize: 14,
+    marginTop: 5,
+    fontWeight: 'bold',
+    position: 'absolute',
+    top: 0,
+    right: 10,
+  },
+  icon: {
+    padding: 10,
+  },
 });
 
 export default ProfileScreen;
