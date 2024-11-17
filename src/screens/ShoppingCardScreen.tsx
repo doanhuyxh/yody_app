@@ -11,8 +11,10 @@ import {
 import {useSelector} from 'react-redux';
 import axiosInstance from '../configs/axios';
 import {formatCurrency} from '../utils/format';
+import { useNavigation } from '@react-navigation/native';
 
 function ShoppingCardScreen() {
+  const navigation = useNavigation()
   const color = useSelector((state: any) => state.color.Colors);
   const size = useSelector((state: any) => state.size.sizes);
 
@@ -118,7 +120,10 @@ function ShoppingCardScreen() {
               {formatCurrency(totalPrice)} VNĐ
             </Text>
           </Text>
-          <TouchableOpacity style={styles.buyButton}>
+          <TouchableOpacity style={styles.buyButton}
+          onPress={()=>{
+            navigation.navigate("CheckOut" as never)
+          }}>
             <Text style={styles.buyButtonText}>
               Mua hàng ({shopping_card.length})
             </Text>
