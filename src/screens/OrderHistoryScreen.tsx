@@ -11,6 +11,7 @@ import {
 import axiosInstance from '../configs/axios';
 import {ProductByVariant} from '../components/Product';
 import {formatCurrency} from '../utils/format';
+import { LoadingText } from '../components/Loading';
 
 function OrderHistoryScreen() {
   const navigation = useNavigation();
@@ -46,6 +47,7 @@ function OrderHistoryScreen() {
 
     axiosInstance.get('/order?page=1&pageSize=100000').then(res => {
       let data: any[] = res.data;
+      console.log(data)
       setDataOrder(data.filter(i => i.status == status));
     });
   }, [status]);
@@ -55,6 +57,10 @@ function OrderHistoryScreen() {
       headerTitle: title,
     });
   }, [title]);
+
+  if (!dataOrder){
+    return <LoadingText message='Đang tải nội dung'/>
+  }
 
   return (
     <ScrollView style={styles.scrollView}>
@@ -83,6 +89,7 @@ function OrderHistoryScreen() {
                   style={{
                     textAlign: 'center',
                     opacity: 0.2,
+                    margin:"auto"
                   }}>
                   Không lấy đc sản phẩm
                 </Text>
@@ -142,6 +149,7 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     marginBottom: 10,
+    height:100
   },
   productImageContainer: {
     width: 'auto',

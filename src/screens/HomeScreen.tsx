@@ -12,10 +12,12 @@ import {
 import Header from '../components/Header';
 import axiosInstance from '../configs/axios';
 import { ProductByCategory } from '../components/Product';
-import BannerSlider, { } from '../components/ScrollFlashList/BannerSlider.tsx'
+import BannerSlider from '../components/ScrollFlashList/BannerSlider';
+import { LoadingText } from '../components/Loading';
 
 function HomeScreen() {
-  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true); // Bắt đầu với trạng thái loading
+  const [refreshing, setRefreshing] = useState(false);
   
   const banner = [
     require('../assets/hero_img1.png'),
@@ -24,17 +26,22 @@ function HomeScreen() {
     require('../assets/hero_img4.png'),
   ];
 
-  const [category, setCategory] = useState<any>([]);
+  const [category, setCategory] = useState([]);
 
-  const CallData = () => {
-    axiosInstance.get('/category').then(res => {
+  const CallData = async () => {
+    try {
+      setRefreshing(true); // Bắt đầu refresh
+      const res = await axiosInstance.get('/category');
       setCategory(res.data);
-      setRefreshing(false);
-    });
+    } catch (error) {
+      console.error('Error fetching category:', error);
+    } finally {
+      setRefreshing(false); // Kết thúc refresh
+      setLoading(false);    // Kết thúc trạng thái loading
+    }
   };
 
   useEffect(() => {
-    setRefreshing(true);
     CallData();
   }, []);
 
@@ -50,11 +57,13 @@ function HomeScreen() {
           <BannerSlider banner={banner} />
         </View>
         <View style={style.categoryContainer}>
-          {category &&
-            category.map((item: any) => (
+          {loading ? (
+            <LoadingText message="Đang tải dữ liệu" />
+          ) : (
+            category.map((item) => (
               <View key={item.Id} style={style.categoryItemsContainer}>
                 <View style={style.categoryItems}>
-                  <View style={style.line}><Text>{}</Text></View>
+                  <View style={style.line}></View>
                   <View style={style.wff}>
                     <Text style={style.text}>{item.Name}</Text>
                   </View>
@@ -63,7 +72,8 @@ function HomeScreen() {
                   <ProductByCategory cateId={item.Id} />
                 </View>
               </View>
-            ))}
+            ))
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -90,7 +100,7 @@ const style = StyleSheet.create({
   categoryItemsContainer: {
     flex: 1,
     marginTop: 20,
-    paddingVertical:30,
+    paddingVertical: 30,
     paddingHorizontal: 10,
     shadowColor: 'gray',
     shadowOffset: { width: 0, height: 2 },
@@ -120,7 +130,7 @@ const style = StyleSheet.create({
     fontSize: 20,
     lineHeight: 24,
   },
-  wff:{
+  wff: {
     flex: 1,
     justifyContent: 'center',
   },

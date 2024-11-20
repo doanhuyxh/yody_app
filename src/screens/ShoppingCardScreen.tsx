@@ -125,7 +125,7 @@ function ShoppingCardScreen() {
             navigation.navigate("CheckOut" as never)
           }}>
             <Text style={styles.buyButtonText}>
-              Mua hàng ({shopping_card.length})
+              Đặt mua ({shopping_card.length})
             </Text>
           </TouchableOpacity>
         </View>
@@ -219,7 +219,9 @@ const styles = StyleSheet.create({
   paymentContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent:'space-between',
     gap: 4,
+    height:40
   },
   totalText: {
     fontSize: 16,

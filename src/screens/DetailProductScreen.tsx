@@ -77,6 +77,13 @@ function DetailProductScreen() {
 
   }
 
+  const HandleBuy = ()=>{
+    HandleAddToCard()
+    setTimeout(()=>{
+      navigation.navigate('ShoppingCard' as never);
+    }, 2000)
+  }
+
   useEffect(() => {
     const fetchProductData = async () => {
       try {
@@ -245,7 +252,8 @@ function DetailProductScreen() {
         </View>
       </ScrollView>
       <View style={styles.containerBtn}>
-        <TouchableOpacity style={styles.buyButton}>
+        <TouchableOpacity style={styles.buyButton}
+        onPress={HandleBuy}>
           <Text style={styles.buyButtonText}>Mua ngay</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.cartButton}

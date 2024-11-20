@@ -4,7 +4,7 @@ import {useSelector} from 'react-redux';
 import axiosInstance from '../../configs/axios';
 import {formatCurrency} from '../../utils/format';
 
-function ProductByVariant({product_id, product_variant_id}) {
+function ProductByVariant({product_id, product_variant_id, typeImage = "row"}) {
   const color = useSelector((state: any) => state.color.Colors);
   const size = useSelector((state: any) => state.size.sizes);
   const category = useSelector((state: any) => state.category.Category);
@@ -25,8 +25,8 @@ function ProductByVariant({product_id, product_variant_id}) {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.imageContainer}>
+    <View style={[styles.container, {flexDirection: typeImage}]}>
+      <View style={[styles.imageContainer]}>
         {images &&
           images.map((item: any, index: number) => {
             if (item.color_id == productVariant?.color_id) {
@@ -42,7 +42,6 @@ function ProductByVariant({product_id, product_variant_id}) {
 
         {!images && <Text style={{color:"#000"}}>Không thể lấy sản phẩm</Text>}
       </View>
-
       <View style={styles.infoContainer}>
         <Text style={styles.productName}>{product?.Product?.name}</Text>
         <Text style={styles.productPrice}>
@@ -59,7 +58,8 @@ function ProductByVariant({product_id, product_variant_id}) {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
+    height:"100%",
+    width:"auto",
     padding: 10,
     marginBottom: 10,
     backgroundColor: '#f9f9f9',
@@ -74,16 +74,20 @@ const styles = StyleSheet.create({
     marginRight: 10,
     width: 'auto',
     height: 'auto',
+    flexDirection:"row",
+    justifyContent:"center"
   },
   productImage: {
     width: 60,
-    height: 100,
-    objectFit: 'contain',
+    height: 120,
+    marginRight:20,
+    objectFit: 'cover',
     borderRadius: 4,
-    transform: [{translateY: -12}],
+    
   },
   infoContainer: {
     flexDirection: 'column',
+    margin:'auto'
   },
   productName: {
     fontSize: 16,
@@ -95,13 +99,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#e53935',
     marginTop: 4,
-    textAlign: 'right',
+    textAlign: 'left',
   },
   productDetails: {
     fontSize: 14,
     color: '#000',
     marginTop: 4,
-    textAlign: 'right',
+    textAlign: 'left',
   },
 });
 
