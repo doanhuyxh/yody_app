@@ -64,12 +64,14 @@ function LoginScreen() {
           style={styles.input}
           placeholder="Email"
           keyboardType="email-address"
+          placeholderTextColor="black"
           value={email}
           onChangeText={text => setEmail(text)}
         />
         <TextInput
           style={styles.input}
           placeholder="Password"
+          placeholderTextColor="black"
           secureTextEntry
           value={password}
           onChangeText={text => setPassword(text)}

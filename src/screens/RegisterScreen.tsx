@@ -52,6 +52,7 @@ function RegisterScreen() {
         <TextInput
           style={styles.input}
           placeholder="Họ và tên"
+          placeholderTextColor="black"
           keyboardType='default'
           value={fullName}
           onChangeText={text => setFullName(text)}
@@ -60,12 +61,14 @@ function RegisterScreen() {
           style={styles.input}
           placeholder="Email"
           keyboardType="email-address"
+          placeholderTextColor="black"
           value={email}
           onChangeText={text => setEmail(text)}
         />
          <TextInput
           style={styles.input}
           placeholder="Số điện thoại"
+          placeholderTextColor="black"
           keyboardType='phone-pad'
           value={phone}
           onChangeText={text => setPhone(text)}
@@ -73,6 +76,7 @@ function RegisterScreen() {
         <TextInput
           style={styles.input}
           placeholder="Password"
+          placeholderTextColor="black"
           secureTextEntry
           value={password}
           onChangeText={text => setPassword(text)}
