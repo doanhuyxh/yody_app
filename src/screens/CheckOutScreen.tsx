@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   TextInput,
+  Alert,
 } from 'react-native';
 import {useEffect, useState} from 'react';
 import {WebView} from 'react-native-webview';
@@ -24,7 +25,6 @@ function CheckOutScreen() {
   const navigation = useNavigation();
   const router = useRoute();
   const [loading, setLoading] = useState<string>('loading');
-  const [res_url, setRes_url] = useState<string>('');
   const color = useSelector((state: any) => state.color.Colors);
   const size = useSelector((state: any) => state.size.sizes);
   const [user, setUser] = useState({
@@ -35,9 +35,10 @@ function CheckOutScreen() {
   });
   const [shopping_card, setShopping_card] = useState<any[]>([]);
   const [totalPrice, setTotalPrice] = useState<number>(0);
-  const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
+  const [paymentUrl, setPaymentUrl] = useState<string | ''>('');
 
   const initiatePayment = async (totalPrice: number) => {
+    
     try {
       const response = await axios.post(
         'https://vnpay.lokid.xyz/api/vnpay-payment',
@@ -46,7 +47,7 @@ function CheckOutScreen() {
       const paymentUrl = response.data.data;
       if (paymentUrl) {
         setPaymentUrl(paymentUrl);
-        setLoading('payment')
+        setLoading('payment');
       }
     } catch (error) {
       console.error('Error initiating payment:', error);
@@ -66,6 +67,7 @@ function CheckOutScreen() {
 
     let res = await axiosInstance.get('/shopping_card');
     let data = res.data;
+    console.log('shopping_card:: ', data);
     let temp_price = 0;
     if (data && data.length !== 0) {
       const tempData = await Promise.all(
@@ -81,13 +83,49 @@ function CheckOutScreen() {
       );
       setTotalPrice(temp_price);
       setShopping_card(tempData);
-      setLoading("showOrder")
+      setLoading('showOrder');
     }
   }
 
   useEffect(() => {
     CallData();
   }, []);
+
+  useEffect(() => {
+    if (loading == 'payment_success') {
+      let product_var_order: any[] = [];
+      let shopping_card_ids: number[] = [];
+
+      shopping_card.forEach(item => {
+        shopping_card_ids.push(item.id);
+        product_var_order.push({
+          product_variant_id: item.product_variant_id,
+          quantity: item.quantity,
+          price: item.price,
+        });
+      });
+
+      const parsedQuery = queryString.parse(paymentUrl);
+
+      let post_data = {
+        shipping_address: user.address,
+        total_amount: totalPrice,
+        order_code: parsedQuery.vnp_TxnRef,
+        order_detail: product_var_order,
+      };
+
+      axiosInstance.post('/order/add_order', post_data).then(res => {
+        shopping_card_ids.forEach(item => {
+          axiosInstance.get(`shopping_card/delete?id=${item}`);
+        });
+      });
+
+      setTimeout(() => {
+        navigation.navigate('OrderHistory' as never, { status: 'pending' });
+      }, 3000);      
+
+    }
+  }, [loading]);
 
   if (loading == 'loading') {
     return <LoadingText message="Đảng tải trang" />;
@@ -122,7 +160,7 @@ function CheckOutScreen() {
                   </Text>
                   <View style={styles.priceQuantityContainer}>
                     <Text style={styles.priceText}>
-                      {formatCurrency(item.price)}
+                      {formatCurrency(item.price)} VNĐ
                     </Text>
                     <Text style={styles.quantityText}>
                       Số lượng: {item.quantity}
@@ -190,20 +228,17 @@ function CheckOutScreen() {
         source={{uri: paymentUrl}}
         onNavigationStateChange={state => {
           if (state.url.includes('yody.lokid.xyz/payment')) {
-            setPaymentUrl(null);
-            setLoading("payment_success")
+            setPaymentUrl(state.url);
+            setLoading('payment_success');
           }
         }}
       />
     );
   }
 
-  if (loading == "payment_success"){
-    return (
-      <LoadingText message='Đang tiến hành tạo đơn hàng'/>
-    )
+  if (loading == 'payment_success') {
+    return <LoadingText message="Đặt hàng thành công, đang chuyển hướng sang đơn hàng" />;
   }
-
 }
 const styles = StyleSheet.create({
   container: {

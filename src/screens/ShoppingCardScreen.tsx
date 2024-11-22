@@ -11,10 +11,10 @@ import {
 import {useSelector} from 'react-redux';
 import axiosInstance from '../configs/axios';
 import {formatCurrency} from '../utils/format';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 
 function ShoppingCardScreen() {
-  const navigation = useNavigation()
+  const navigation = useNavigation();
   const color = useSelector((state: any) => state.color.Colors);
   const size = useSelector((state: any) => state.size.sizes);
 
@@ -62,6 +62,11 @@ function ShoppingCardScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {shopping_card && shopping_card.length == 0 && (
+        <View style={styles.centerContent}>
+          <Text style={styles.text}>Không có sản phẩm nào</Text>
+        </View>
+      )}
       <ScrollView>
         {shopping_card &&
           shopping_card.map((item: any, index: number) => (
@@ -120,10 +125,13 @@ function ShoppingCardScreen() {
               {formatCurrency(totalPrice)} VNĐ
             </Text>
           </Text>
-          <TouchableOpacity style={styles.buyButton}
-          onPress={()=>{
-            navigation.navigate("CheckOut" as never)
-          }}>
+          <TouchableOpacity
+            style={styles.buyButton}
+            onPress={() => {
+              if (shopping_card.length) {
+                navigation.navigate('CheckOut' as never);
+              }
+            }}>
             <Text style={styles.buyButtonText}>
               Đặt mua ({shopping_card.length})
             </Text>
@@ -219,15 +227,15 @@ const styles = StyleSheet.create({
   paymentContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent:'space-between',
+    justifyContent: 'space-between',
     gap: 4,
-    height:40
+    height: 40,
   },
   totalText: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 8,
-    color:"red"
+    color: 'red',
   },
   buyButton: {
     backgroundColor: '#ff6347',
@@ -242,6 +250,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     flexWrap: 'nowrap',
+  },
+  centerContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  text: {
+    color: 'black',
+    fontSize: 16,
   },
 });
 
