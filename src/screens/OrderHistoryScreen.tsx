@@ -15,7 +15,7 @@ import { LoadingText } from '../components/Loading';
 
 function OrderHistoryScreen() {
   const navigation = useNavigation();
-  const route = useRoute();
+  const route = useRoute<any>();
   const {status} = route.params || {status:''};
 
   const [title, setTitle] = useState<string>('');

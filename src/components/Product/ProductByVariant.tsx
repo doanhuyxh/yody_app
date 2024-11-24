@@ -4,7 +4,7 @@ import {useSelector} from 'react-redux';
 import axiosInstance from '../../configs/axios';
 import {formatCurrency} from '../../utils/format';
 
-function ProductByVariant({product_id, product_variant_id, typeImage = "row"}) {
+function ProductByVariant({product_id, product_variant_id}: {product_id: any, product_variant_id: any}) {
   const color = useSelector((state: any) => state.color.Colors);
   const size = useSelector((state: any) => state.size.sizes);
   const category = useSelector((state: any) => state.category.Category);
@@ -25,7 +25,7 @@ function ProductByVariant({product_id, product_variant_id, typeImage = "row"}) {
   }, []);
 
   return (
-    <View style={[styles.container, {flexDirection: typeImage}]}>
+    <View style={[styles.container, {flexDirection: "row"}]}>
       <View style={[styles.imageContainer]}>
         {images &&
           images.map((item: any, index: number) => {

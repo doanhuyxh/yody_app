@@ -16,7 +16,7 @@ import BannerSlider from '../components/ScrollFlashList/BannerSlider';
 import { LoadingText } from '../components/Loading';
 
 function HomeScreen() {
-  const [loading, setLoading] = useState(true); // Bắt đầu với trạng thái loading
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   
   const banner = [
@@ -30,14 +30,14 @@ function HomeScreen() {
 
   const CallData = async () => {
     try {
-      setRefreshing(true); // Bắt đầu refresh
+      setRefreshing(true);
       const res = await axiosInstance.get('/category');
       setCategory(res.data);
     } catch (error) {
       console.error('Error fetching category:', error);
     } finally {
-      setRefreshing(false); // Kết thúc refresh
-      setLoading(false);    // Kết thúc trạng thái loading
+      setRefreshing(false);
+      setLoading(false);
     }
   };
 
@@ -60,7 +60,7 @@ function HomeScreen() {
           {loading ? (
             <LoadingText message="Đang tải dữ liệu" />
           ) : (
-            category.map((item) => (
+            category.map((item:any) => (
               <View key={item.Id} style={style.categoryItemsContainer}>
                 <View style={style.categoryItems}>
                   <View style={style.line}></View>

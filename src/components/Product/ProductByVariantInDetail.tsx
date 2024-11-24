@@ -4,7 +4,7 @@ import {useSelector} from 'react-redux';
 import axiosInstance from '../../configs/axios';
 import {formatCurrency} from '../../utils/format';
 
-function ProductByVariantInDetail({product_id, product_variant_id}) {
+function ProductByVariantInDetail({product_id, product_variant_id}: {product_id: any, product_variant_id: any}) {
   const color = useSelector((state: any) => state.color.Colors);
   const size = useSelector((state: any) => state.size.sizes);
 

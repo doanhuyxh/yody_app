@@ -120,8 +120,8 @@ function CheckOutScreen() {
         });
       });
 
-      setTimeout(() => {
-        navigation.navigate('OrderHistory' as never, { status: 'pending' });
+      setTimeout((navigation) => {
+        navigation.navigate('OrderHistory' as any, { status: 'pending' });
       }, 3000);      
 
     }
