@@ -60,6 +60,15 @@ function ShoppingCardScreen() {
     }
   };
 
+  useEffect(()=>{
+    let total_price_temp = 0
+
+    shopping_card.forEach(item=>{
+      console.log(item)
+    })
+
+  },[shopping_card])
+
   return (
     <SafeAreaView style={styles.container}>
       {shopping_card && shopping_card.length == 0 && (

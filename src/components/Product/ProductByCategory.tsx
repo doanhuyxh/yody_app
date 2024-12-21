@@ -3,6 +3,7 @@ import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import axiosInstance from '../../configs/axios';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
+import { formatCurrency } from '../../utils/format';
 
 type ProductByCategoryProps = {
   cateId: number;
@@ -80,7 +81,7 @@ const ProductByCategory: React.FC<ProductByCategoryProps> = ({cateId}) => {
           <View>
             <View style={style.productTitle}>
               <Text style={style.productName}>{item.name}</Text>
-              <Text style={style.productPrice}>Giá: {item.price} VNĐ</Text>
+              <Text style={style.productPrice}>Giá: {formatCurrency(item.price)} VNĐ</Text>
             </View>
             <View style={style.btnContainer}>
               <TouchableOpacity
